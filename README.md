@@ -47,6 +47,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 ## Deployed Link
 
+https://fauzia91.github.io/sql-employee-tracker/
 
 ## Questions
 [www.github.com/Fauzia91]
