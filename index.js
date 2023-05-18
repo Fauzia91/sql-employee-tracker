@@ -16,7 +16,7 @@ const connection = mysql.createConnection({
 const questions = [{
     type: "list",
     name: "selected",
-    choices: ["view all departments", "view all roles", "view all employees", "add a department", "add a role", "add an employee", "update an employee role"],
+    choices: ["view all departments", "view all roles", "view all employees", "add a department", "add a role", "add an employee", "update an employee role","quit"],
     message: "What would you like to do?"
 }]
 
@@ -41,6 +41,7 @@ function init() {
         case "add a role": addRole(); break;
         case "add an employee": addEmployee(); break;
         case "update an employee role": updateEmployee(); break;
+        case "quit": console.log("exit"); break;
 
     }
 
@@ -97,36 +98,60 @@ function getRoles(){
 }
 
 function addEmployee(){
+    connection.query(`Select * from role`, function(err, roleResult){
+        connection.query(`Select * from employee`, function(err, employeeResult){
+            
+            let roleList = [];
+            roleResult.map(r=>{
+                roleList.push(r.id + "_" + r.title)
+            })
+
+            let employeeList = [];
+            employeeResult.map(r=>{
+                employeeList.push(r.id + "_" + r.first_name + " " + r.last_name)
+            })
+            employeeList.push("0_No Manager")
+    
+    
+            inquirer
+            .prompt([{
+                type: "input",
+                name: "fn",
+                message: "What is your first name?"
+            },{
+                type: "input",
+                name: "ln",
+                message: "What is your last name?"
+            },{
+                type: "list",
+                choices: roleList,
+                name: "role_id",
+                message: "Select a role?"
+            },{
+                type: "list",
+                choices: employeeList,
+                name: "manager_id",
+                message: "Select a manager"
+            }])
+            .then((answers) => {
+                const roleID= answers.role_id.split("_")[0];
+                const managerID= answers.manager_id.split("_")[0];
+
+                connection.query(`INSERT INTO employee (id, first_name, last_name, role_id, manager_id) VALUES (NULL, '${answers.fn}', '${answers.ln}', ${roleID}, ${managerID} );`, function(err, result){
+                    console.log("employee added");
+                    console.log(err)
+        
+                    init(); 
+                });
+        
+            })
+        });
+    });
+
 
     // first name, last name, role, and manager, and that
 
-    inquirer
-    .prompt([{
-        type: "input",
-        name: "fn",
-        message: "What is your first name?"
-    },{
-        type: "input",
-        name: "ln",
-        message: "What is your last name?"
-    },{
-        type: "input",
-        name: "role_id",
-        message: "What is your role id?"
-    },{
-        type: "input",
-        name: "manager_id",
-        message: "What is your manager_id?"
-    }])
-    .then((answers) => {
-        connection.query(`INSERT INTO employee (id, first_name, last_name, role_id, manager_id) VALUES (NULL, '${answers.fn}', '${answers.ln}', ${answers.role_id}, ${answers.manager_id} );`, function(err, result){
-            console.log("employee added");
-            console.log(err)
-
-            init(); 
-        });
-
-    })
+   
 }
 
 function addDepartment(){
@@ -149,30 +174,48 @@ function addDepartment(){
 }
 
 function addRole(){
+
+    connection.query(`Select * from department`, function(err, result){
+      
+
+        let departmentList = [];
+        result.map(r=>{
+            departmentList.push(r.id + "_" + r.name)
+        })
+
+
+
+        inquirer
+        .prompt([{
+            type: "input",
+            name: "title",
+            message: "What is the job title?"
+        },{
+            type: "input",
+            name: "salary",
+            message: "What is the salary?"
+        },{
+            type: "list",
+            name: "department_id",
+            choices: departmentList,
+            message: "Select a department?"
+        }])
+        .then((answers) => {
+            //1_sales
+            let dID = answers.department_id.split("_")[0]
+
+    
+            connection.query("INSERT INTO `role` (`id`, `title`, `salary`, `department_id`) VALUES (NULL, '"+ answers.title + "', '"+ answers.salary +"', " + dID + ");", function(err, result){
+                console.log("employee added")
+                init(); 
+            });
+    
+        })
+      
+    });
+    
    
-    inquirer
-    .prompt([{
-        type: "input",
-        name: "title",
-        message: "What is the job title?"
-    },{
-        type: "input",
-        name: "salary",
-        message: "What is the salary?"
-    },{
-        type: "input",
-        name: "department_id",
-        message: "What is department ID?"
-    }])
-    .then((answers) => {
-
-
-        connection.query("INSERT INTO `role` (`id`, `title`, `salary`, `department_id`) VALUES (NULL, '"+ answers.title + "', '"+ answers.salary +"', " + answers.department_id + ");", function(err, result){
-            console.log("employee added")
-            init(); 
-        });
-
-    })
+   
 }
 
 function updateEmployee(){
@@ -198,3 +241,6 @@ function updateEmployee(){
 
 
 }
+
+
+//UPDATE department SET name="data" WHERE id = 11;
