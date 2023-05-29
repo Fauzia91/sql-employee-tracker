@@ -6,7 +6,8 @@ A command-line application built from scratch using Node.js, Inquirer, and my SQ
 
 ## Drive Link
 
-https://drive.google.com/file/d/1vZu-cIqS69XZhPwTXa7Hz9Hk86tA_bZa/view
+https://drive.google.com/file/d/1LOdzCFt2GKo3gQOqYLN6-yDbgg2yxzvd/view
+
 
 ## Table of Contents 
 - [Installation](#installation)
@@ -54,4 +55,8 @@ https://fauzia91.github.io/sql-employee-tracker/
 
 [fauzia_azad91@yahoo.com](fauzia_azad91@yahoo.com)
 
+    
+    mysql -v
+
+    mysql -u root -p
     
